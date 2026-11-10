@@ -1,0 +1,84 @@
+[
+  {
+    "end_device_ids": {
+      "device_id": "e31hltec",
+      "application_ids": { "application_id": "e31" },
+      "dev_eui": "70B3D57ED00724FA"
+    },
+    "received_at": "2025-08-21T21:08:51.011075263Z",
+    "uplink_message": {
+      "f_port": 1,
+      "f_cnt": 18,
+      "decoded_payload": { "message": "temperatura,23.0,C,umidade,60.0,%" },
+      "settings": { "time": "2025-08-21T21:08:50.613867Z" }
+    }
+  },
+  {
+    "end_device_ids": {
+      "device_id": "e31hltec",
+      "application_ids": { "application_id": "e31" },
+      "dev_eui": "70B3D57ED00724FA"
+    },
+    "received_at": "2025-08-21T21:18:51.020000000Z",
+    "uplink_message": {
+      "f_port": 1,
+      "f_cnt": 19,
+      "decoded_payload": { "message": "temperatura,23.4,C,umidade,59.1,%" },
+      "settings": { "time": "2025-08-21T21:18:50.600000Z" }
+    }
+  },
+  {
+    "end_device_ids": {
+      "device_id": "e31hltec2",
+      "application_ids": { "application_id": "e31" },
+      "dev_eui": "70B3D57ED00724FB"
+    },
+    "received_at": "2025-08-21T21:08:55.500000000Z",
+    "uplink_message": {
+      "f_port": 1,
+      "f_cnt": 7,
+      "decoded_payload": { "message": "temperatura,25.1,C,umidade,55.0,%" },
+      "settings": { "time": "2025-08-21T21:08:55.100000Z" }
+    }
+  },
+  {
+    "end_device_ids": {
+      "device_id": "e31hltec",
+      "application_ids": { "application_id": "e31" },
+      "dev_eui": "70B3D57ED00724FA"
+    },
+    "received_at": "2025-08-21T21:08:51.011075263Z",
+    "uplink_message": {
+      "f_port": 1,
+      "f_cnt": 18,
+      "decoded_payload": { "message": "temperatura,23.0,C,umidade,60.0,%" },
+      "settings": { "time": "2025-08-21T21:08:50.613867Z" }
+    }
+  },
+  {
+    "end_device_ids": {
+      "device_id": "sem-dev-eui",
+      "application_ids": { "application_id": "e31" }
+    },
+    "received_at": "2025-08-21T21:09:00.000000000Z",
+    "uplink_message": {
+      "f_port": 1,
+      "f_cnt": 1,
+      "decoded_payload": { "message": "temperatura,20.0,C" }
+    }
+  },
+  {
+    "end_device_ids": {
+      "device_id": "e31hltec2",
+      "application_ids": { "application_id": "e31" },
+      "dev_eui": "70B3D57ED00724FB"
+    },
+    "received_at": "2025-08-21T21:28:55.500000000Z",
+    "uplink_message": {
+      "f_port": 1,
+      "f_cnt": 8,
+      "decoded_payload": { "message": "temperatura,abc,C" },
+      "settings": { "time": "2025-08-21T21:28:55.100000Z" }
+    }
+  }
+]
