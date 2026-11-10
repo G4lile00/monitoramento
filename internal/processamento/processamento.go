@@ -10,7 +10,7 @@ import (
 	"log/slog"
 	"time"
 
-	"tcc-monitoramento/internal/contrato"
+	"monitoramento/internal/contrato"
 )
 
 // ErrPermanente marca falhas que não se resolvem com nova tentativa (por

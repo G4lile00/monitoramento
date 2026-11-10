@@ -12,8 +12,8 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"tcc-monitoramento/internal/modelo"
-	"tcc-monitoramento/internal/processamento"
+	"monitoramento/internal/modelo"
+	"monitoramento/internal/processamento"
 )
 
 // Repo acessa o PostgreSQL.

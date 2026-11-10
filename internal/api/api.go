@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"tcc-monitoramento/internal/modelo"
+	"monitoramento/internal/modelo"
 )
 
 const (

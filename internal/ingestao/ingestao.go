@@ -10,7 +10,7 @@ import (
 	"log/slog"
 	"time"
 
-	"tcc-monitoramento/internal/contrato"
+	"monitoramento/internal/contrato"
 )
 
 // Armazenamento é a camada de persistência bruta.

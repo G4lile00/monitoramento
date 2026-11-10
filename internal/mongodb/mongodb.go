@@ -14,7 +14,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 
-	"tcc-monitoramento/internal/processamento"
+	"monitoramento/internal/processamento"
 )
 
 // Estados do documento na fila de trabalho.

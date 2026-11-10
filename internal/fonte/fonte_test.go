@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"tcc-monitoramento/internal/fonte"
-	"tcc-monitoramento/internal/ingestao"
+	"monitoramento/internal/fonte"
+	"monitoramento/internal/ingestao"
 )
 
 func TestLer_Formatos(t *testing.T) {

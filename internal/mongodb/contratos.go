@@ -1,8 +1,8 @@
 package mongodb
 
 import (
-	"tcc-monitoramento/internal/ingestao"
-	"tcc-monitoramento/internal/processamento"
+	"monitoramento/internal/ingestao"
+	"monitoramento/internal/processamento"
 )
 
 // Verificações em tempo de compilação: Store cumpre as interfaces dos

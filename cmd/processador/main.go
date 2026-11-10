@@ -11,10 +11,10 @@ import (
 	"sync"
 	"syscall"
 
-	"tcc-monitoramento/internal/config"
-	"tcc-monitoramento/internal/mongodb"
-	"tcc-monitoramento/internal/postgres"
-	"tcc-monitoramento/internal/processamento"
+	"monitoramento/internal/config"
+	"monitoramento/internal/mongodb"
+	"monitoramento/internal/postgres"
+	"monitoramento/internal/processamento"
 )
 
 func main() {

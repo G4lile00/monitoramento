@@ -12,10 +12,10 @@ import (
 	"os/signal"
 	"syscall"
 
-	"tcc-monitoramento/internal/config"
-	"tcc-monitoramento/internal/fonte"
-	"tcc-monitoramento/internal/ingestao"
-	"tcc-monitoramento/internal/mongodb"
+	"monitoramento/internal/config"
+	"monitoramento/internal/fonte"
+	"monitoramento/internal/ingestao"
+	"monitoramento/internal/mongodb"
 )
 
 func main() {

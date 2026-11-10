@@ -4,14 +4,14 @@ export
 .PHONY: up down reset test carregar processar api
 
 up:
-	docker compose up -d
+	podman compose up -d
 
 down:
-	docker compose down
+	podman compose down
 
 # Apaga os volumes (zera MongoDB e PostgreSQL).
 reset:
-	docker compose down -v
+	podman compose down -v
 
 test:
 	go test ./...

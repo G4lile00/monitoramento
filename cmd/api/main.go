@@ -12,9 +12,9 @@ import (
 	"syscall"
 	"time"
 
-	"tcc-monitoramento/internal/api"
-	"tcc-monitoramento/internal/config"
-	"tcc-monitoramento/internal/postgres"
+	"monitoramento/internal/api"
+	"monitoramento/internal/config"
+	"monitoramento/internal/postgres"
 )
 
 func main() {

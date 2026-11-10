@@ -1,8 +1,8 @@
 package postgres
 
 import (
-	"tcc-monitoramento/internal/api"
-	"tcc-monitoramento/internal/processamento"
+	"monitoramento/internal/api"
+	"monitoramento/internal/processamento"
 )
 
 // Verificações em tempo de compilação: Repo cumpre as interfaces dos

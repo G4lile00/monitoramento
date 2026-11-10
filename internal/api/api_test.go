@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"tcc-monitoramento/internal/modelo"
+	"monitoramento/internal/modelo"
 )
 
 type consultasFalsas struct {
