@@ -3,17 +3,19 @@
 Fluxo: mensagem de uplink (TTN) → **MongoDB** (bruto + fila) → worker de
 processamento → **PostgreSQL/TimescaleDB/PostGIS** (estruturado) → **API REST**.
 
-Neste momento a entrada de mensagens é feita por **arquivo JSON** (`cmd/carregar`),
-no lugar do broker MQTT. Ele usa o mesmo `ingestao.Servico` que o worker MQTT
-usará, então trocar a fonte não altera validação, idempotência nem rejeições.
+A entrada de mensagens pode ser o **broker MQTT** (`cmd/ingestor`) ou um **arquivo
+JSON** (`cmd/carregar`, para testes locais). Os dois usam o mesmo
+`ingestao.Servico`, então validação, idempotência e rejeições são idênticas.
 
 ## Estrutura
 
 | Caminho | Conteúdo |
 |---|---|
+| `cmd/ingestor` | Worker: MQTT → MongoDB (ACK só depois de persistir) |
 | `cmd/carregar` | Ingere um arquivo JSON no MongoDB (substitui o MQTT nos testes) |
 | `cmd/processador` | Worker: MongoDB (pendentes) → PostgreSQL |
-| `cmd/api` | API REST de consulta |
+| `cmd/api` | API REST de consulta e Swagger |
+| `cmd/*/Dockerfile` | Uma imagem por componente (contexto de build na raiz) |
 | `internal/contrato` | Contrato do uplink TTN, validação, chave de idempotência, parsing das medições |
 | `internal/fonte` | Leitura de mensagens de arquivo JSON |
 | `internal/ingestao` | Validar e persistir (ou rejeitar) cada mensagem |
@@ -25,9 +27,31 @@ usará, então trocar a fonte não altera validação, idempotência nem rejeiç
 
 ## Rodando localmente
 
+### Tudo em containers (podman)
+
 ```bash
 cp .env.example .env
-make up          # MongoDB + PostgreSQL + migrações (Docker)
+make up          # MongoDB, PostgreSQL, migrações, processador e API
+make carregar    # JSON -> MongoDB (o processador em container move para o PostgreSQL)
+make mqtt        # opcional: inclui o ingestor MQTT (preencha MQTT_* no .env)
+make logs
+```
+
+Swagger (com exemplos de queries): <http://localhost:8080/swagger>
+· especificação: <http://localhost:8080/openapi.json>
+
+> O `Makefile` usa `podman compose`; com Docker, troque por `docker compose`.
+>
+> O ingestor MQTT depende do cliente `paho`, que ainda não está no `go.mod`.
+> Rode uma vez `go get github.com/eclipse/paho.mqtt.golang && go mod tidy` e
+> faça commit de `go.mod` e `go.sum`. Até lá, o Dockerfile do ingestor resolve
+> a dependência no próprio build (`go mod tidy`); os outros dois usam o `go.sum`.
+
+### Comandos Go na máquina (sem containers de aplicação)
+
+```bash
+cp .env.example .env
+make up-infra    # só MongoDB + PostgreSQL + migrações
 make carregar    # JSON -> MongoDB
 make processar   # MongoDB -> PostgreSQL (Ctrl+C quando esvaziar a fila)
 make api         # http://localhost:8080
@@ -51,6 +75,8 @@ Resultado esperado do exemplo: no MongoDB, 4 documentos em `mensagens_brutas`
 
 | Rota | Descrição |
 |---|---|
+| `GET /swagger` | Documentação interativa (Swagger UI; carrega os scripts de um CDN) |
+| `GET /openapi.json` | Especificação OpenAPI 3 |
 | `GET /saude` | Verifica a conexão com o PostgreSQL |
 | `GET /sensores` | Lista sensores (com latitude/longitude quando cadastradas) |
 | `GET /leituras` | Filtros: `dev_eui`, `grandeza`, `de`, `ate` (RFC 3339), `limite` (1–1000, padrão 100) |

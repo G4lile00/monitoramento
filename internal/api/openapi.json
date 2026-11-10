@@ -1,0 +1,198 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "API de monitoramento ambiental",
+    "version": "0.1.0",
+    "description": "Consulta aos dados estruturados (PostgreSQL) da plataforma de persistência híbrida.\n\nOs exemplos usam as mensagens de `testdata/mensagens_exemplo.json` (agosto de 2025). Sem `de`/`ate`, `/leituras` consulta apenas as últimas 24 horas."
+  },
+  "servers": [{ "url": "/" }],
+  "tags": [
+    { "name": "Operação", "description": "Verificação de saúde" },
+    { "name": "Consulta", "description": "Sensores e leituras" }
+  ],
+  "paths": {
+    "/saude": {
+      "get": {
+        "tags": ["Operação"],
+        "summary": "Verifica a conexão com o PostgreSQL",
+        "responses": {
+          "200": {
+            "description": "API e banco respondendo",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Saude" },
+                "example": { "status": "ok" }
+              }
+            }
+          },
+          "503": {
+            "description": "Banco indisponível",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Saude" },
+                "example": { "status": "indisponivel" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sensores": {
+      "get": {
+        "tags": ["Consulta"],
+        "summary": "Lista os sensores cadastrados",
+        "description": "Inclui latitude e longitude quando a localização do sensor foi cadastrada.",
+        "responses": {
+          "200": {
+            "description": "Lista de sensores (vazia quando não há nenhum)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Sensor" }
+                },
+                "example": [
+                  {
+                    "id_sensor": 1,
+                    "codigo_dispositivo": "e31hltec",
+                    "dev_eui": "70B3D57ED00724FA",
+                    "nome": null,
+                    "ativo": true,
+                    "ultimo_uplink_em": "2025-08-21T21:18:50.6Z",
+                    "latitude": null,
+                    "longitude": null
+                  }
+                ]
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/ErroInterno" }
+        }
+      }
+    },
+    "/leituras": {
+      "get": {
+        "tags": ["Consulta"],
+        "summary": "Consulta leituras (mais recentes primeiro)",
+        "description": "O intervalo é semiaberto: `de` <= medido_em < `ate`. Cada leitura referencia o documento bruto original no MongoDB por `mongo_id`.",
+        "parameters": [
+          {
+            "name": "dev_eui",
+            "in": "query",
+            "description": "Filtra por sensor (16 caracteres hexadecimais; maiúsculas ou minúsculas).",
+            "schema": { "type": "string", "pattern": "^[0-9A-Fa-f]{16}$" },
+            "example": "70B3D57ED00724FA"
+          },
+          {
+            "name": "grandeza",
+            "in": "query",
+            "description": "Filtra por grandeza.",
+            "schema": { "type": "string", "enum": ["temperatura", "umidade"] },
+            "example": "temperatura"
+          },
+          {
+            "name": "de",
+            "in": "query",
+            "description": "Início do intervalo, RFC 3339. Padrão: 24 h antes de `ate`.",
+            "schema": { "type": "string", "format": "date-time" },
+            "example": "2025-08-21T00:00:00Z"
+          },
+          {
+            "name": "ate",
+            "in": "query",
+            "description": "Fim do intervalo (exclusivo), RFC 3339. Padrão: agora.",
+            "schema": { "type": "string", "format": "date-time" },
+            "example": "2025-08-22T00:00:00Z"
+          },
+          {
+            "name": "limite",
+            "in": "query",
+            "description": "Máximo de leituras retornadas.",
+            "schema": { "type": "integer", "minimum": 1, "maximum": 1000, "default": 100 },
+            "example": 10
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de leituras (vazia quando não há resultados)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Leitura" }
+                },
+                "example": [
+                  {
+                    "dev_eui": "70B3D57ED00724FA",
+                    "grandeza": "temperatura",
+                    "unidade": "C",
+                    "medido_em": "2025-08-21T21:18:50.6Z",
+                    "valor": 23.4,
+                    "mongo_id": "66c6a1f2e4b0a1b2c3d4e5f6"
+                  }
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "Parâmetro inválido",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Erro" },
+                "example": { "erro": "parâmetro 'de' deve estar em RFC 3339" }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/ErroInterno" }
+        }
+      }
+    }
+  },
+  "components": {
+    "responses": {
+      "ErroInterno": {
+        "description": "Erro interno (os detalhes ficam apenas no log do servidor)",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Erro" },
+            "example": { "erro": "erro interno" }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "Saude": {
+        "type": "object",
+        "properties": { "status": { "type": "string", "enum": ["ok", "indisponivel"] } }
+      },
+      "Erro": {
+        "type": "object",
+        "properties": { "erro": { "type": "string" } }
+      },
+      "Sensor": {
+        "type": "object",
+        "properties": {
+          "id_sensor": { "type": "integer" },
+          "codigo_dispositivo": { "type": "string", "description": "device_id do TTN" },
+          "dev_eui": { "type": "string" },
+          "nome": { "type": "string", "nullable": true },
+          "ativo": { "type": "boolean" },
+          "ultimo_uplink_em": { "type": "string", "format": "date-time", "nullable": true },
+          "latitude": { "type": "number", "nullable": true },
+          "longitude": { "type": "number", "nullable": true }
+        }
+      },
+      "Leitura": {
+        "type": "object",
+        "properties": {
+          "dev_eui": { "type": "string" },
+          "grandeza": { "type": "string" },
+          "unidade": { "type": "string" },
+          "medido_em": { "type": "string", "format": "date-time" },
+          "valor": { "type": "number" },
+          "mongo_id": { "type": "string", "description": "_id do documento em mensagens_brutas (MongoDB)" }
+        }
+      }
+    }
+  }
+}

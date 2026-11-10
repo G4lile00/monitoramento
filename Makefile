@@ -1,10 +1,22 @@
 -include .env
 export
 
-.PHONY: up down reset test carregar processar api
+.PHONY: up up-infra mqtt down reset logs test carregar processar api
 
+# Tudo em containers: MongoDB, PostgreSQL, migrações, processador e API.
 up:
-	podman compose up -d
+	podman compose up -d --build
+
+# Só MongoDB, PostgreSQL e migrações (para rodar os comandos Go na máquina).
+up-infra:
+	podman compose up -d mongo postgres migrar
+
+# Inclui o ingestor MQTT (configure MQTT_* no .env).
+mqtt:
+	podman compose --profile mqtt up -d --build
+
+logs:
+	podman compose --profile mqtt logs -f --tail=50
 
 down:
 	podman compose down

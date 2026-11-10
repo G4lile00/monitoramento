@@ -41,6 +41,9 @@ func Handler(c Consultas, log *slog.Logger) http.Handler {
 func novo(c Consultas, log *slog.Logger, agora func() time.Time) http.Handler {
 	s := &servidor{c: c, log: log, agora: agora}
 	mux := http.NewServeMux()
+	mux.HandleFunc("GET /{$}", s.raiz)
+	mux.HandleFunc("GET /swagger", s.swagger)
+	mux.HandleFunc("GET /openapi.json", s.openapi)
 	mux.HandleFunc("GET /saude", s.saude)
 	mux.HandleFunc("GET /sensores", s.sensores)
 	mux.HandleFunc("GET /leituras", s.leituras)

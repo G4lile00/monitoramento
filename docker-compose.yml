@@ -1,6 +1,13 @@
-# Serviços de apoio para desenvolvimento local.
-#   docker compose up -d   -> sobe MongoDB e PostgreSQL e aplica as migrações
-# A API e os workers rodam na máquina (go run), não neste compose.
+# Ambiente local completo.
+#
+#   podman compose up -d --build   (ou: docker compose ...)
+#       sobe MongoDB, PostgreSQL, migrações, processador e API
+#       API e Swagger: http://localhost:8080/swagger
+#
+#   podman compose --profile mqtt up -d --build
+#       inclui também o ingestor MQTT (exige MQTT_BROKER etc. no .env)
+#
+# Para testar sem broker, use "make carregar" (arquivo JSON -> MongoDB).
 
 services:
   mongo:
@@ -49,6 +56,62 @@ services:
       - -f
       - /migrations/0001_init.up.sql
     restart: "no"
+
+  # MQTT -> MongoDB. Só sobe com --profile mqtt.
+  ingestor:
+    profiles: ["mqtt"]
+    build:
+      context: .
+      dockerfile: cmd/ingestor/Dockerfile
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      MQTT_BROKER: ${MQTT_BROKER:-}
+      MQTT_USUARIO: ${MQTT_USUARIO:-}
+      MQTT_SENHA: ${MQTT_SENHA:-}
+      MQTT_TOPICO: ${MQTT_TOPICO:-v3/+/devices/+/up}
+      MQTT_CLIENT_ID: ${MQTT_CLIENT_ID:-tcc-ingestor}
+      MQTT_QOS: ${MQTT_QOS:-1}
+      MONGO_URI: mongodb://mongo:27017
+      MONGO_DB: ${MONGO_DB:-tcc_bruto}
+    restart: unless-stopped
+
+  # MongoDB -> PostgreSQL.
+  processador:
+    build:
+      context: .
+      dockerfile: cmd/processador/Dockerfile
+    depends_on:
+      mongo:
+        condition: service_healthy
+      migrar:
+        condition: service_completed_successfully
+    environment:
+      MONGO_URI: mongodb://mongo:27017
+      MONGO_DB: ${MONGO_DB:-tcc_bruto}
+      DATABASE_URL: postgres://tcc:tcc@postgres:5432/tcc?sslmode=disable
+      WORKERS: ${WORKERS:-2}
+      MAX_TENTATIVAS: ${MAX_TENTATIVAS:-5}
+      RESERVA_SEGUNDOS: ${RESERVA_SEGUNDOS:-60}
+      INTERVALO_MS: ${INTERVALO_MS:-500}
+      AUTO_CADASTRAR_SENSOR: ${AUTO_CADASTRAR_SENSOR:-true}
+    restart: unless-stopped
+
+  # API REST + Swagger.
+  api:
+    build:
+      context: .
+      dockerfile: cmd/api/Dockerfile
+    depends_on:
+      migrar:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgres://tcc:tcc@postgres:5432/tcc?sslmode=disable
+      API_ADDR: ":8080"
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
 
 volumes:
   mongo-data:
