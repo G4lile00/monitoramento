@@ -1,0 +1,13 @@
+# Segredos e configuração local (RNF06)
+.env
+
+# Binários e artefatos
+bin/
+*.test
+*.out
+coverage.*
+
+# Editores
+.idea/
+.vscode/
+.DS_Store
