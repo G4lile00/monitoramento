@@ -3,11 +3,13 @@ module monitoramento
 go 1.25.0
 
 require (
+	github.com/eclipse/paho.mqtt.golang v1.5.1
 	github.com/jackc/pgx/v5 v5.12.0
 	go.mongodb.org/mongo-driver/v2 v2.10.0
 )
 
 require (
+	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/puddle/v2 v2.2.3 // indirect
@@ -16,6 +18,7 @@ require (
 	github.com/xdg-go/stringprep v1.0.4 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
 	golang.org/x/crypto v0.54.0 // indirect
+	golang.org/x/net v0.56.0 // indirect
 	golang.org/x/sync v0.22.0 // indirect
 	golang.org/x/text v0.41.0 // indirect
 )
