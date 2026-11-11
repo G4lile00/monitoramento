@@ -86,6 +86,25 @@ func (r *Repo) GravarLeituras(ctx context.Context, l processamento.Lote) error {
 		return fmt.Errorf("atualizar último uplink: %w", err)
 	}
 
+	// Localização trazida pela mensagem (ex.: tags do ChirpStack). Só
+	// preenche quando o sensor ainda não tem localização cadastrada — não
+	// sobrescreve um cadastro manual feito por rotas administrativas.
+	if l.Latitude != nil && l.Longitude != nil {
+		altArg := any(nil)
+		if l.Altitude != nil {
+			altArg = *l.Altitude
+		}
+		_, err = tx.Exec(ctx, `
+			UPDATE sensor
+			   SET localizacao = ST_SetSRID(ST_MakePoint($2, $3), 4326),
+			       altitude_m  = COALESCE(altitude_m, $4)
+			 WHERE id_sensor = $1 AND localizacao IS NULL`,
+			idSensor, *l.Longitude, *l.Latitude, altArg)
+		if err != nil {
+			return fmt.Errorf("atualizar localização: %w", err)
+		}
+	}
+
 	if err := tx.Commit(ctx); err != nil {
 		return fmt.Errorf("confirmar transação: %w", err)
 	}

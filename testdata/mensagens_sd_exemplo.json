@@ -1,0 +1,176 @@
+[
+  {
+    "deduplicationId": "833657f0-20de-4ad0-b56c-c06d776b0cd0",
+    "time": "2026-10-21T17:11:58.016+00:00",
+    "deviceInfo": {
+      "tenantId": "17cf7e4d-ae62-442b-8bc3-b48d85a9e310",
+      "tenantName": "IoTEC",
+      "applicationId": "4e97de35-d0ea-4b6d-8cfd-6a8cf88e9451",
+      "applicationName": "TESTE_HELTEC_LORAWAN",
+      "deviceProfileId": "fdfffd2f-a739-4562-853b-4bec57ff45df",
+      "deviceProfileName": "HELTEC_V3_AU915_TESTE_Natan",
+      "deviceName": "HELTEC_TESTE_017",
+      "devEui": "60b4d64fa899e3eb",
+      "deviceClassEnabled": "CLASS_A",
+      "tags": {
+        "Altitude": "6.8 metros ",
+        "Latitude": "-26.917836273741372",
+        "Longitude": "-48.66544228404989"
+      }
+    },
+    "devAddr": "00e05ba2",
+    "adr": true,
+    "dr": 2,
+    "fCnt": 0,
+    "fPort": 1,
+    "confirmed": false,
+    "data": "AGQ8vADxMd0H2Q==",
+    "object": {
+      "vibracao_pico_ms2": 1,
+      "temperatura_c": 24.1,
+      "bateria_v": 4.34,
+      "umidade_pct": 49,
+      "pressao_hpa": 1021,
+      "inclinacao_sensor_deg": 155.48,
+      "solo_pct": 7
+    },
+    "rxInfo": [
+      {
+        "gatewayId": "ac1f09fffe18a84d",
+        "uplinkId": 308853364,
+        "rssi": -72,
+        "snr": 11.2,
+        "location": {
+          "latitude": -26.91695,
+          "longitude": -48.66614,
+          "altitude": 25,
+          "source": "GPS"
+        }
+      }
+    ],
+    "regionConfigId": "au915_0"
+  },
+  {
+    "deduplicationId": "44109908-ecfd-4f1d-b760-38ed77bc6ff0",
+    "time": "2026-10-16T18:22:59.789+00:00",
+    "deviceInfo": {
+      "tenantId": "17cf7e4d-ae62-442b-8bc3-b48d85a9e310",
+      "tenantName": "IoTEC",
+      "applicationId": "4e97de35-d0ea-4b6d-8cfd-6a8cf88e9451",
+      "applicationName": "TESTE_HELTEC_LORAWAN",
+      "deviceProfileId": "fdfffd2f-a739-4562-853b-4bec57ff45df",
+      "deviceProfileName": "HELTEC_V3_AU915_TESTE_Natan",
+      "deviceName": "HELTEC_TESTE_017",
+      "devEui": "60b4d64fa899e3eb",
+      "deviceClassEnabled": "CLASS_A",
+      "tags": {
+        "Altitude": "6.8 metros ",
+        "Longitude": "-48.66544228404989",
+        "Latitude": "-26.917836273741372"
+      }
+    },
+    "devAddr": "01be06ad",
+    "adr": true,
+    "dr": 2,
+    "fCnt": 0,
+    "fPort": 1,
+    "confirmed": false,
+    "data": "AAAeDgDzO9Epzw==",
+    "object": {
+      "bateria_v": 4.14,
+      "temperatura_c": 24.3,
+      "solo_pct": 41,
+      "pressao_hpa": 1009,
+      "vibracao_pico_ms2": 0,
+      "inclinacao_sensor_deg": 76.94,
+      "umidade_pct": 59
+    },
+    "regionConfigId": "au915_0"
+  },
+  {
+    "deduplicationId": "833657f0-20de-4ad0-b56c-c06d776b0cd0",
+    "time": "2026-10-21T17:11:58.016+00:00",
+    "deviceInfo": {
+      "tenantId": "17cf7e4d-ae62-442b-8bc3-b48d85a9e310",
+      "tenantName": "IoTEC",
+      "applicationId": "4e97de35-d0ea-4b6d-8cfd-6a8cf88e9451",
+      "applicationName": "TESTE_HELTEC_LORAWAN",
+      "deviceProfileId": "fdfffd2f-a739-4562-853b-4bec57ff45df",
+      "deviceProfileName": "HELTEC_V3_AU915_TESTE_Natan",
+      "deviceName": "HELTEC_TESTE_017",
+      "devEui": "60b4d64fa899e3eb",
+      "deviceClassEnabled": "CLASS_A",
+      "tags": {
+        "Latitude": "-26.917836273741372",
+        "Altitude": "6.8 metros ",
+        "Longitude": "-48.66544228404989"
+      }
+    },
+    "devAddr": "00e05ba2",
+    "adr": true,
+    "dr": 2,
+    "fCnt": 0,
+    "fPort": 1,
+    "confirmed": false,
+    "data": "AGQ8vADxMd0H2Q==",
+    "object": {
+      "vibracao_pico_ms2": 1,
+      "temperatura_c": 24.1,
+      "bateria_v": 4.34,
+      "umidade_pct": 49,
+      "pressao_hpa": 1021,
+      "inclinacao_sensor_deg": 155.48,
+      "solo_pct": 7
+    },
+    "regionConfigId": "au915_0"
+  },
+  {
+    "deduplicationId": "b0226c57-b397-4d3b-b53f-9f7b79e1edaa",
+    "time": "2026-10-16T17:11:45.271+00:00",
+    "deviceInfo": {
+      "tenantId": "17cf7e4d-ae62-442b-8bc3-b48d85a9e310",
+      "tenantName": "IoTEC",
+      "applicationId": "4e97de35-d0ea-4b6d-8cfd-6a8cf88e9451",
+      "applicationName": "TESTE_HELTEC_LORAWAN",
+      "deviceProfileId": "fdfffd2f-a739-4562-853b-4bec57ff45df",
+      "deviceProfileName": "HELTEC_V3_AU915_TESTE_Natan",
+      "deviceName": "HELTEC_TESTE_017",
+      "devEui": "60b4d64fa899e3eb",
+      "deviceClassEnabled": "CLASS_A",
+      "tags": {
+        "Latitude": "-26.917836273741372",
+        "Altitude": "6.8 metros ",
+        "Longitude": "-48.66544228404989"
+      }
+    },
+    "devAddr": "01ec0f1b",
+    "regionConfigId": "au915_0"
+  },
+  {
+    "time": "2026-10-16T15:41:28.545393145+00:00",
+    "deviceInfo": {
+      "tenantId": "17cf7e4d-ae62-442b-8bc3-b48d85a9e310",
+      "tenantName": "IoTEC",
+      "applicationId": "4e97de35-d0ea-4b6d-8cfd-6a8cf88e9451",
+      "applicationName": "TESTE_HELTEC_LORAWAN",
+      "deviceProfileId": "fdfffd2f-a739-4562-853b-4bec57ff45df",
+      "deviceProfileName": "HELTEC_V3_AU915_TESTE_Natan",
+      "deviceName": "HELTEC_TESTE_017",
+      "devEui": "60b4d64fa899e3eb",
+      "deviceClassEnabled": "CLASS_A",
+      "tags": {
+        "Latitude": "-26.917836273741372",
+        "Longitude": "-48.66544228404989",
+        "Altitude": "6.8 metros "
+      }
+    },
+    "level": "ERROR",
+    "code": "OTAA",
+    "description": "DevNonce has already been used",
+    "context": {
+      "join_eui": "0101010101010101",
+      "deduplication_id": "019e1582-c1de-4d07-9b4d-51f405cae5e8",
+      "dev_nonce": "9"
+    }
+  }
+]

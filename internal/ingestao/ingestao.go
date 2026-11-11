@@ -2,6 +2,10 @@
 // recebida e persisti-la no armazenamento bruto (MongoDB) ou registrá-la como
 // rejeitada. O acesso ao banco fica atrás de uma interface para que a regra
 // seja testável sem infraestrutura.
+//
+// O parser é injetável para permitir múltiplos contratos (TTN v3, ChirpStack
+// v4). Por padrão usa contrato.ParseAutomatico, que detecta o formato pelo
+// conteúdo; workers específicos podem injetar parsers dedicados.
 package ingestao
 
 import (
@@ -22,17 +26,32 @@ type Armazenamento interface {
 	InserirRejeitada(ctx context.Context, topico string, recebidaEm time.Time, conteudo []byte, motivo string) error
 }
 
+// Parser converte o payload bruto em uma Mensagem. Retorna erro (que vira
+// registro em mensagens_rejeitadas) quando o conteúdo não é reconhecido.
+type Parser func([]byte) (contrato.Mensagem, error)
+
 // Servico valida e persiste as mensagens recebidas.
 type Servico struct {
-	arm Armazenamento
-	log *slog.Logger
+	arm    Armazenamento
+	log    *slog.Logger
+	parser Parser
 	// Agora fornece o relógio; substituível em testes.
 	Agora func() time.Time
 }
 
-// Novo cria o serviço de ingestão.
+// Novo cria o serviço de ingestão com o parser automático (detecta TTN v3
+// e ChirpStack v4 pelo conteúdo da mensagem).
 func Novo(arm Armazenamento, log *slog.Logger) *Servico {
-	return &Servico{arm: arm, log: log, Agora: time.Now}
+	return &Servico{arm: arm, log: log, parser: contrato.ParseAutomatico, Agora: time.Now}
+}
+
+// NovoComParser cria o serviço com um parser dedicado. Útil para testes
+// ou para workers que sabem exatamente qual contrato esperam.
+func NovoComParser(arm Armazenamento, log *slog.Logger, p Parser) *Servico {
+	if p == nil {
+		p = contrato.ParseAutomatico
+	}
+	return &Servico{arm: arm, log: log, parser: p, Agora: time.Now}
 }
 
 // Tratar processa uma mensagem. Mensagens inválidas são registradas como
@@ -41,7 +60,7 @@ func Novo(arm Armazenamento, log *slog.Logger) *Servico {
 func (s *Servico) Tratar(ctx context.Context, topico string, payload []byte) error {
 	agora := s.Agora().UTC()
 
-	uplink, err := contrato.ParseUplink(payload)
+	msg, err := s.parser(payload)
 	if err != nil {
 		if errR := s.arm.InserirRejeitada(ctx, topico, agora, payload, err.Error()); errR != nil {
 			return fmt.Errorf("registrar rejeição: %w", errR)
@@ -50,12 +69,12 @@ func (s *Servico) Tratar(ctx context.Context, topico string, payload []byte) err
 		return nil
 	}
 
-	duplicada, err := s.arm.InserirBruta(ctx, uplink.ChaveIdempotencia(), topico, agora, payload)
+	duplicada, err := s.arm.InserirBruta(ctx, msg.ChaveIdempotencia(), topico, agora, payload)
 	if err != nil {
 		return fmt.Errorf("persistir mensagem bruta: %w", err)
 	}
 	if duplicada {
-		s.log.Debug("reentrega ignorada", "chave", uplink.ChaveIdempotencia())
+		s.log.Debug("reentrega ignorada", "chave", msg.ChaveIdempotencia())
 	}
 	return nil
 }

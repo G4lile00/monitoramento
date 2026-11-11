@@ -112,6 +112,27 @@ func (u *Uplink) Medicoes() ([]Medicao, error) {
 	return ParseMensagem(u.UplinkMessage.DecodedPayload.Message)
 }
 
+// ---- Métodos de Mensagem (interface comum entre contratos) ----
+// Mantidos junto à implementação TTN. Os campos continuam acessíveis
+// diretamente para os testes e para o código legado que os usava.
+
+// ApplicationID retorna o end_device_ids.application_ids.application_id.
+func (u *Uplink) ApplicationID() string { return u.EndDeviceIDs.ApplicationIDs.ApplicationID }
+
+// DeviceID retorna o end_device_ids.device_id.
+func (u *Uplink) DeviceID() string { return u.EndDeviceIDs.DeviceID }
+
+// DevEUI retorna o dev_eui normalizado.
+func (u *Uplink) DevEUI() string { return u.EndDeviceIDs.DevEUI }
+
+// JoinEUI retorna o join_eui (pode ser vazio).
+func (u *Uplink) JoinEUI() string { return u.EndDeviceIDs.JoinEUI }
+
+// Localizacao retorna nil para o TTN, que não traz coordenadas no exemplo
+// de payload usado até aqui. Quando o campo existir, basta estender este
+// método sem alterar a assinatura.
+func (u *Uplink) Localizacao() (lat, lon, alt *float64) { return nil, nil, nil }
+
 // ParseMensagem interpreta o texto CSV no formato
 // "codigo,valor,unidade[,codigo,valor,unidade...]", por exemplo
 // "temperatura,23.0,C,umidade,60.0,%".

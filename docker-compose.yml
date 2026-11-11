@@ -5,7 +5,13 @@
 #       API e Swagger: http://localhost:8080/swagger
 #
 #   podman compose --profile mqtt up -d --build
-#       inclui também o ingestor MQTT (exige MQTT_BROKER etc. no .env)
+#       inclui o ingestor MQTT TTN (exige MQTT_* no .env)
+#
+#   podman compose --profile sensor_deslizamento up -d --build
+#       inclui o ingestor MQTT ChirpStack v4 (exige SD_MQTT_* no .env)
+#
+#   podman compose --profile mqtt --profile sensor_deslizamento up -d --build
+#       sobe os dois ingestores ao mesmo tempo (TTN + ChirpStack)
 #
 # Para testar sem broker, use "make carregar" (arquivo JSON -> MongoDB).
 
@@ -40,7 +46,8 @@ services:
       retries: 20
 
   # Tarefa única: aplica as migrações quando o PostgreSQL estiver saudável.
-  # É idempotente, então pode rodar a cada "up".
+  # É idempotente, então pode rodar a cada "up". Inclui 0001 (modelo base)
+  # e 0002 (grandezas do sensor de deslizamento).
   migrar:
     image: timescale/timescaledb-ha:pg16
     depends_on:
@@ -49,12 +56,12 @@ services:
     volumes:
       - ./migrations:/migrations:ro
     entrypoint:
-      - psql
-      - postgres://tcc:tcc@postgres:5432/tcc
-      - -v
-      - ON_ERROR_STOP=1
-      - -f
-      - /migrations/0001_init.up.sql
+      - sh
+      - -c
+      - |
+        psql postgres://tcc:tcc@postgres:5432/tcc -v ON_ERROR_STOP=1 \
+          -f /migrations/0001_init.up.sql \
+          -f /migrations/0002_grandezas_sd.up.sql
     restart: "no"
 
   # MQTT -> MongoDB. Só sobe com --profile mqtt.
@@ -73,6 +80,27 @@ services:
       MQTT_TOPICO: ${MQTT_TOPICO:-v3/+/devices/+/up}
       MQTT_CLIENT_ID: ${MQTT_CLIENT_ID:-tcc-ingestor}
       MQTT_QOS: ${MQTT_QOS:-1}
+      MONGO_URI: mongodb://mongo:27017
+      MONGO_DB: ${MONGO_DB:-tcc_bruto}
+    restart: unless-stopped
+
+  # MQTT (ChirpStack v4) -> MongoDB. Só sobe com --profile sensor_deslizamento.
+  # Variáveis com prefixo SD_* para poder rodar em paralelo com o ingestor TTN.
+  sensor_deslizamento:
+    profiles: ["sensor_deslizamento"]
+    build:
+      context: .
+      dockerfile: cmd/sensor_deslizamento/Dockerfile
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      SD_MQTT_BROKER: ${SD_MQTT_BROKER:-}
+      SD_MQTT_USUARIO: ${SD_MQTT_USUARIO:-}
+      SD_MQTT_SENHA: ${SD_MQTT_SENHA:-}
+      SD_MQTT_TOPICO: ${SD_MQTT_TOPICO:-application/+/device/+/event/up}
+      SD_MQTT_CLIENT_ID: ${SD_MQTT_CLIENT_ID:-tcc-sensor-deslizamento}
+      SD_MQTT_QOS: ${SD_MQTT_QOS:-1}
       MONGO_URI: mongodb://mongo:27017
       MONGO_DB: ${MONGO_DB:-tcc_bruto}
     restart: unless-stopped

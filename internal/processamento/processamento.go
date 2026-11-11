@@ -34,6 +34,13 @@ type Lote struct {
 	MedidoEm      time.Time
 	MongoID       string
 	Medicoes      []contrato.Medicao
+
+	// Localização opcional vinda junto com a mensagem (tags do ChirpStack).
+	// Quando preenchida e o sensor ainda não tem localização cadastrada,
+	// o repositório a aplica a sensor.localizacao/altitude_m.
+	Latitude  *float64
+	Longitude *float64
+	Altitude  *float64
 }
 
 // Fila é a fila de trabalho persistente (MongoDB).
@@ -63,10 +70,11 @@ type Config struct {
 
 // Processador consome a fila.
 type Processador struct {
-	Fila Fila
-	Repo Repositorio
-	Cfg  Config
-	Log  *slog.Logger
+	Fila   Fila
+	Repo   Repositorio
+	Cfg    Config
+	Log    *slog.Logger
+	Parser func([]byte) (contrato.Mensagem, error) // default: contrato.ParseAutomatico
 }
 
 // Executar processa documentos em laço até o contexto ser cancelado.
@@ -116,24 +124,31 @@ func (p *Processador) Tratar(ctx context.Context, workerID string, item *Item) {
 }
 
 func (p *Processador) processar(ctx context.Context, item *Item) error {
-	uplink, err := contrato.ParseUplink(item.JSON)
+	parser := p.Parser
+	if parser == nil {
+		parser = contrato.ParseAutomatico
+	}
+	msg, err := parser(item.JSON)
 	if err != nil {
 		return fmt.Errorf("%w: %v", ErrPermanente, err)
 	}
-	medicoes, err := uplink.Medicoes()
+	medicoes, err := msg.Medicoes()
 	if err != nil {
 		return fmt.Errorf("%w: %v", ErrPermanente, err)
 	}
 
-	ids := uplink.EndDeviceIDs
+	lat, lon, alt := msg.Localizacao()
 	return p.Repo.GravarLeituras(ctx, Lote{
-		ApplicationID: ids.ApplicationIDs.ApplicationID,
-		DeviceID:      ids.DeviceID,
-		DevEUI:        ids.DevEUI,
-		JoinEUI:       ids.JoinEUI,
-		MedidoEm:      uplink.MedidoEm(),
+		ApplicationID: msg.ApplicationID(),
+		DeviceID:      msg.DeviceID(),
+		DevEUI:        msg.DevEUI(),
+		JoinEUI:       msg.JoinEUI(),
+		MedidoEm:      msg.MedidoEm(),
 		MongoID:       item.ID,
 		Medicoes:      medicoes,
+		Latitude:      lat,
+		Longitude:     lon,
+		Altitude:      alt,
 	})
 }
 

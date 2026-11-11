@@ -56,6 +56,27 @@ func CarregarIngestor() (Ingestor, error) {
 	return c, l.erro()
 }
 
+// CarregarIngestorSD lê a configuração do worker MQTT do sensor de
+// deslizamento (ChirpStack v4). Usa o prefixo SD_MQTT_* para não colidir com
+// o ingestor TTN quando ambos rodam no mesmo ambiente.
+//
+// Tópico default: application/+/device/+/event/up — formato do ChirpStack v4
+// (em que o "+" curinga casa application_id e dev_eui).
+func CarregarIngestorSD() (Ingestor, error) {
+	var l leitor
+	c := Ingestor{
+		MQTTBroker:   l.obrigatorio("SD_MQTT_BROKER"),
+		MQTTUsuario:  l.texto("SD_MQTT_USUARIO", ""),
+		MQTTSenha:    l.texto("SD_MQTT_SENHA", ""),
+		MQTTTopico:   l.texto("SD_MQTT_TOPICO", "application/+/device/+/event/up"),
+		MQTTClientID: l.texto("SD_MQTT_CLIENT_ID", "tcc-sensor-deslizamento"),
+		MQTTQoS:      byte(l.inteiro("SD_MQTT_QOS", 1, 0, 2)),
+		MongoURI:     l.obrigatorio("MONGO_URI"),
+		MongoDB:      l.texto("MONGO_DB", "tcc_bruto"),
+	}
+	return c, l.erro()
+}
+
 // CarregarProcessador lê a configuração do worker de processamento.
 func CarregarProcessador() (Processador, error) {
 	var l leitor
