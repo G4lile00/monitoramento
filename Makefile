@@ -1,7 +1,7 @@
 -include .env
 export
 
-.PHONY: up up-infra mqtt sd down reset logs test carregar processar api
+.PHONY: up up-infra mqtt sd simular-sd down reset logs test carregar carregar-sd processar api
 
 # Tudo em containers: MongoDB, PostgreSQL, migrações, processador e API.
 up:
@@ -19,6 +19,14 @@ mqtt:
 # Configure SD_MQTT_* no .env.
 sd:
 	podman compose --profile sensor_deslizamento up -d --build
+
+# Infra completa + ingere testdata/mensagens_sd_exemplo.json no MongoDB
+# (simula o ChirpStack sem broker). O carregar-sd é one-shot: roda uma vez,
+# ingere e encerra; o processador (que ficou no ar) consome os documentos
+# e grava no PostgreSQL. Acompanhe com: make logs
+simular-sd:
+	podman compose --profile carregar-sd up -d --build
+	podman compose logs --tail=20 carregar-sd
 
 # Sobe os dois ingestores ao mesmo tempo (TTN + ChirpStack).
 mqtt+sd:

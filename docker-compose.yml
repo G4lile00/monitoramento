@@ -105,6 +105,33 @@ services:
       MONGO_DB: ${MONGO_DB:-tcc_bruto}
     restart: unless-stopped
 
+  # One-shot: ingere testdata/mensagens_sd_exemplo.json (ChirpStack v4) no
+  # MongoDB. Para testar o fluxo completo sem broker. Roda uma vez e encerra;
+  # o processador (que está rodando) consome os documentos e grava no
+  # PostgreSQL automaticamente.
+  #
+  #   docker compose --profile carregar-sd up --build carregar-sd
+  #   (sem -d: vê a saída no terminal; container encerra ao terminar)
+  carregar-sd:
+    profiles: ["carregar-sd"]
+    build:
+      context: .
+      dockerfile: cmd/carregar/Dockerfile
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      MONGO_URI: mongodb://mongo:27017
+      MONGO_DB: ${MONGO_DB:-tcc_bruto}
+    volumes:
+      - ./testdata:/testdata:ro
+    command:
+      - "-arquivo"
+      - "/testdata/mensagens_sd_exemplo.json"
+      - "-topico"
+      - "chirpstack/simulado"
+    restart: "no"
+
   # MongoDB -> PostgreSQL.
   processador:
     build:

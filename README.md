@@ -78,6 +78,16 @@ Para subir os dois ingestores ao mesmo tempo:
 make mqtt+sd     # TTN + ChirpStack em paralelo
 ```
 
+**Sem Go instalado na máquina:** para testar o fluxo completo do ChirpStack
+usando só o compose (sem broker real), suba a infra + o carregador one-shot:
+
+```bash
+make simular-sd  # sobe mongo+postgres+migrar+processador+api e ingere
+                 # testdata/mensagens_sd_exemplo.json uma única vez;
+                 # o processador consome e grava no PostgreSQL automaticamente
+make logs        # acompanha a fila sendo consumida
+```
+
 Swagger (com exemplos de queries): <http://localhost:8080/swagger>
 · especificação: <http://localhost:8080/openapi.json>
 
